@@ -5,6 +5,7 @@ import { StaticImage } from "gatsby-plugin-image"
 import Layout from "../components/layout"
 import Seo from "../components/seo"
 import * as styles from "../components/index.module.css"
+import * as DOMPurify from 'dompurify';
 
 const links = [
   {
@@ -68,8 +69,11 @@ const moreLinks = [
 ]
 
 const utmParameters = `?utm_source=starter&utm_medium=start-page&utm_campaign=default-starter`
-
-const IndexPage = () => (
+function createMarkup(str) {
+  return {
+     __html: DOMPurify.sanitize(`<b>>>>>>> ${str}</b>`)   };
+};
+const IndexPage = ({ serverData }) => (
   <Layout>
     <div className={styles.textCenter}>
       <StaticImage
@@ -81,6 +85,8 @@ const IndexPage = () => (
         alt=""
         style={{ marginBottom: `var(--space-3)` }}
       />
+          {/* <img alt="Happy dog" src={serverData.message} /> */}
+      <div dangerouslySetInnerHTML={createMarkup(JSON.stringify(serverData, null, 2))} />;
       <h1>
         Welcome to <b>Gatsby!</b>
       </h1>
@@ -126,3 +132,22 @@ const IndexPage = () => (
 export const Head = () => <Seo title="Home" />
 
 export default IndexPage
+
+export async function getServerData() {
+  try {
+    const res = await fetch(`https://dog.ceo/api/breeds/image/random`)
+    if (!res.ok) {
+      throw new Error(`Response failed`)
+    }
+
+    return {
+      props: await res.json(),
+    }
+  } catch (error) {
+    return {
+      status: 500,
+      headers: {},
+      props: {}
+    }
+  }
+}
