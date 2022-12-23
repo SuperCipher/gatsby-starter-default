@@ -3,7 +3,11 @@ import { Link } from "gatsby"
 
 import Layout from "../components/layout"
 import Seo from "../components/seo"
-
+import sanitizeHtml from 'sanitize-html';
+function createMarkup(str) {
+  return {
+     __html: sanitizeHtml(`<h1><b>>>>>>><br/> ${str}</br></h1>`)   };
+};
 const UsingSSR = ({ serverData }) => {
   return (
     <Layout>
@@ -15,6 +19,8 @@ const UsingSSR = ({ serverData }) => {
         Reload it to see a(nother) random photo from{" "}
         <code>dog.ceo/api/breed/shiba/images/random</code>:
       </p>
+      <div dangerouslySetInnerHTML={createMarkup(JSON.stringify(serverData, null, 2))} />
+
       <img
         style={{ width: "320px", borderRadius: "var(--border-radius)" }}
         alt="A random dog"
